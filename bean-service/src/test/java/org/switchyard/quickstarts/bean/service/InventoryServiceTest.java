@@ -19,7 +19,9 @@
 
 package org.switchyard.quickstarts.bean.service;
 
+import org.apache.camel.CamelContext;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.switchyard.test.InvocationFaultException;
@@ -35,6 +37,13 @@ public class InventoryServiceTest {
 
     @ServiceOperation("InventoryService.lookupItem")
     private Invoker lookupItem;
+
+    private CamelContext context;
+
+    @Before
+    public void setUp() {
+        context.setTracing(true);
+    }
 
     @Test
     public void testItemLookupExists() throws Exception {
