@@ -21,44 +21,32 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 <switchyard xmlns="urn:switchyard-config:switchyard:1.0"
-    xmlns:camel="urn:switchyard-component-camel:config:1.0"
+    xmlns:quartz="urn:switchyard-component-camel-quartz:config:1.0"
     xmlns:sql="urn:switchyard-component-camel-sql:config:1.0"
     xmlns:swyd="urn:switchyard-config:switchyard:1.0"
-    xmlns:selector="urn:switchyard-component-common-selector:config:1.0"
     xmlns:bean="urn:switchyard-component-bean:config:1.0">
 
-    <composite xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912"
-        name="camel-sql-binding" targetNamespace="urn:switchyard-quickstart:camel-sql-binding:0.1.0">
-    
-        <component name="CamelComponent">
-            <service name="GreetingService">
-                <interface.java interface="org.switchyard.quickstarts.camel.sql.binding.GreetingService" />
-            </service>
+    <composite xmlns="http://docs.oasis-open.org/ns/opencsa/sca/200912" name="camel-sql-binding"
+        targetNamespace="urn:switchyard-quickstart:camel-sql-binding:0.1.0">
+        <service name="GreetingService" promote="GreetingService/GreetingService">
+            <interface.java interface="org.switchyard.quickstarts.camel.sql.binding.GreetingService" />
+            <quartz:binding.quartz>
+                <swyd:operationSelector operationName="retrieve" />
+                <quartz:name>EveryFiveSecondsJob</quartz:name>
+                <quartz:cron>*/5 * * * * ?</quartz:cron>
+            </quartz:binding.quartz>
+            <quartz:binding.quartz>
+                <swyd:operationSelector operationName="store" />
+                <quartz:name>EverySecondJob</quartz:name>
+                <quartz:cron>* * * * * ?</quartz:cron>
+            </quartz:binding.quartz>
+        </service>
 
-            <camel:implementation.camel>
-                <camel:xml path="META-INF/route.xml"/>
-            </camel:implementation.camel>
-
-            <reference name="GreetingsDatabaseStore">
-                <swyd:interface.esb inputType="java:org.switchyard.quickstarts.camel.sql.binding.Greeting" remotable="false" />
-            </reference>
-            <reference name="GreetingsDatabaseRetrieve">
-                <swyd:interface.esb inputType="java:java.lang.String" outputType="java:java.util.List" remotable="false" />
-            </reference>
-        </component>
-
-        <reference name="GreetingsDatabaseStore" multiplicity="0..1" promote="GreetingsDatabaseStore">
-            <swyd:interface.esb inputType="java:org.switchyard.quickstarts.camel.sql.binding.Greeting" remotable="false" />
+        <reference name="StoreService" multiplicity="0..1" promote="GreetingService/StoreService">
+            <interface.java interface="org.switchyard.quickstarts.camel.sql.binding.StoreService" />
             <sql:binding.sql>
-                <sql:query>INSERT INTO greetings (name,sender) VALUES (#,#)</sql:query>
-                <sql:dataSourceRef>java:jboss/datasources/GreetDS</sql:dataSourceRef>
-            </sql:binding.sql>
-        </reference>
-
-        <reference name="GreetingsDatabaseRetrieve" multiplicity="0..1" promote="GreetingsDatabaseRetrieve">
-            <swyd:interface.esb inputType="java:java.lang.String" outputType="java:java.util.List" remotable="false" />
-            <sql:binding.sql>
-                <sql:query>SELECT * FROM greetings</sql:query>
+                <sql:messageComposer class="org.switchyard.quickstarts.camel.sql.binding.SqlMessageComposer" />
+                <sql:query>INSERT INTO GREETINGS (NAME,SENDER) VALUES (#,#)</sql:query>
                 <sql:dataSourceRef>java:jboss/datasources/GreetDS</sql:dataSourceRef>
             </sql:binding.sql>
         </reference>

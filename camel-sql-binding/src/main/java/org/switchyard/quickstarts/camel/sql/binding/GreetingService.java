@@ -19,7 +19,6 @@
 package org.switchyard.quickstarts.camel.sql.binding;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Simple interface for a Greeter Service.
@@ -28,7 +27,8 @@ import java.util.Map;
  */
 public interface GreetingService {
 
-    void store(String name);
+    void store(Greeting greeting);
 
-    List<Map<String, Object>> retrieve();
+    List<Greeting> retrieve();
+
 }

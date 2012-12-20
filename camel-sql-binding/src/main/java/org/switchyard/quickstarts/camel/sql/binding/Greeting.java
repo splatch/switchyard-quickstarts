@@ -32,8 +32,8 @@ public class Greeting {
     /**
      * Creates greeting.
      * 
-     * @param name Person to receive greet.
-     * @param sender Greeting sender.
+     * @param object Person to receive greet.
+     * @param object2 Greeting sender.
      */
     public Greeting(String name, String sender) {
         this._name = name;

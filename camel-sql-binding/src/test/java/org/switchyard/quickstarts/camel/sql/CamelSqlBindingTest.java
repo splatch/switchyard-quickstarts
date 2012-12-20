@@ -26,10 +26,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
+import org.apache.camel.component.quartz.QuartzEndpoint;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -39,13 +41,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.switchyard.Message;
 import org.switchyard.component.bean.config.model.BeanSwitchYardScanner;
+import org.switchyard.component.test.mixins.cdi.CDIMixIn;
+import org.switchyard.component.test.mixins.naming.NamingMixIn;
 import org.switchyard.quickstarts.camel.sql.binding.Greeting;
 import org.switchyard.test.Invoker;
 import org.switchyard.test.ServiceOperation;
 import org.switchyard.test.SwitchYardRunner;
 import org.switchyard.test.SwitchYardTestCaseConfig;
-import org.switchyard.component.test.mixins.cdi.CDIMixIn;
-import org.switchyard.component.test.mixins.naming.NamingMixIn;
 
 /**
  * SQL binding test - checks insert and retrieve operation.
@@ -68,9 +70,11 @@ public class CamelSqlBindingTest {
     @ServiceOperation("GreetingService")
     private Invoker invoker;
 
+    private CamelContext camelContext;
+
     private NamingMixIn mixin;
 
-	private static JdbcDataSource dataSource;
+    private static JdbcDataSource dataSource;
 
     @BeforeClass
     public static void startUp() throws Exception {
@@ -104,21 +108,24 @@ public class CamelSqlBindingTest {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldRetrieveGreetings() throws Exception {
+        cleanupQuartz();
+        camelContext.removeEndpoints("quartz:*");
         PreparedStatement statement = connection.prepareStatement("INSERT INTO greetings (name, sender) VALUES (?,?)");
         statement.setString(1, RECEIVER);
         statement.setString(2, SENDER);
         assertEquals(1, statement.executeUpdate());
 
         Message message = invoker.operation("retrieve").sendInOut(null);
-        List<Map<String, Object>> content = message.getContent(List.class);
+        List<Greeting> content = message.getContent(List.class);
 
-        Map<String, Object> firstRow = content.iterator().next();
-        Assert.assertEquals(RECEIVER, firstRow.get("name"));
-        Assert.assertEquals(SENDER, firstRow.get("sender"));
+        Greeting firstRow = content.iterator().next();
+        Assert.assertEquals(RECEIVER, firstRow.getName());
+        Assert.assertEquals(SENDER, firstRow.getSender());
     }
 
     @Test
     public void shouldStoreGreet() throws Exception {
+        cleanupQuartz();
         invoker.operation("store").sendInOnly(new Greeting(RECEIVER, SENDER));
 
         ResultSet result = connection.createStatement().executeQuery("SELECT * FROM greetings");
@@ -127,6 +134,18 @@ public class CamelSqlBindingTest {
         result.close();
     }
 
+
+    private void cleanupQuartz() {
+        for (Endpoint endpoint : camelContext.getEndpoints()) {
+            if (endpoint instanceof QuartzEndpoint) {
+               try {
+                    ((QuartzEndpoint) endpoint).suspend();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     @AfterClass
     public static void shutDown() throws SQLException {
