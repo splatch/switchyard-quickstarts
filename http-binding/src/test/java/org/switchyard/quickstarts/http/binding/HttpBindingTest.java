@@ -28,7 +28,7 @@ import org.switchyard.test.SwitchYardTestCaseConfig;
 import org.switchyard.test.SwitchYardTestKit;
 import org.switchyard.component.test.mixins.cdi.CDIMixIn;
 import org.switchyard.component.test.mixins.http.HTTPMixIn;
-import org.switchyard.transform.config.model.TransformSwitchYardScanner;
+import org.switchyard.transformation.config.model.TransformSwitchYardScanner;
 
 /**
  * Tests for Camel CXFRS binding.

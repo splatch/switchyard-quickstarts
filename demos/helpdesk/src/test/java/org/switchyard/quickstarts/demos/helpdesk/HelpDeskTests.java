@@ -25,7 +25,7 @@ import org.switchyard.component.test.mixins.cdi.CDIMixIn;
 import org.switchyard.component.test.mixins.http.HTTPMixIn;
 import org.switchyard.test.SwitchYardRunner;
 import org.switchyard.test.SwitchYardTestCaseConfig;
-import org.switchyard.transform.config.model.TransformSwitchYardScanner;
+import org.switchyard.transformation.config.model.TransformSwitchYardScanner;
 
 /**
  * @author David Ward &lt;<a href="mailto:dward@jboss.org">dward@jboss.org</a>&gt; &copy; 2012 Red Hat Inc.

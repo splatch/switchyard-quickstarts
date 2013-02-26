@@ -27,7 +27,7 @@ import org.switchyard.test.ServiceOperation;
 import org.switchyard.test.SwitchYardRunner;
 import org.switchyard.test.SwitchYardTestCaseConfig;
 import org.switchyard.component.test.mixins.cdi.CDIMixIn;
-import org.switchyard.transform.config.model.TransformSwitchYardScanner;
+import org.switchyard.transformation.config.model.TransformSwitchYardScanner;
 
 @RunWith(SwitchYardRunner.class)
 @SwitchYardTestCaseConfig(mixins = CDIMixIn.class, scanners = TransformSwitchYardScanner.class)

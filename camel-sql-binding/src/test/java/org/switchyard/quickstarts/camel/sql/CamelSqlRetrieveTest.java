@@ -35,7 +35,7 @@ import org.switchyard.quickstarts.camel.sql.binding.GreetingService;
 import org.switchyard.test.MockHandler;
 import org.switchyard.test.SwitchYardTestCaseConfig;
 import org.switchyard.test.SwitchYardTestKit;
-import org.switchyard.transform.config.model.TransformSwitchYardScanner;
+import org.switchyard.transformation.config.model.TransformSwitchYardScanner;
 
 @SwitchYardTestCaseConfig(
     config = SwitchYardTestCaseConfig.SWITCHYARD_XML,
